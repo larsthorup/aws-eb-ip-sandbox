@@ -1,0 +1,19 @@
+{
+  "name": "aws-eb-ip-sandbox",
+  "version": "0.1.0",
+  "description": "Create AWS Elastic Beanstalk environment with fixed ip outbound requests for white list protecting external services",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/larsthorup/aws-eb-ip-sandbox.git"
+  },
+  "author": "Lars Thorup <lars@zealake.com> (https://www.zealake.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/larsthorup/aws-eb-ip-sandbox/issues"
+  },
+  "homepage": "https://github.com/larsthorup/aws-eb-ip-sandbox#readme"
+}
