@@ -1,4 +1,11 @@
-if [ -z "$VPC_NAME" ]; then { echo "Error: run . script/configure"; exit 1; } fi
+if [ -z "$AWS_VPC_NAME" ]; then { echo "Error: run . script/configure"; exit 1; } fi
 
-VPC_ID=$(aws ec2 create-vpc --cidr-block $VPC_CIDR_BLOCK --output text --query 'Vpc.VpcId')
-aws ec2 create-tags --resources $VPC_ID --tags Key=Name,Value=$VPC_NAME
+# Create VPC
+
+AWS_VPC_ID=$(aws ec2 create-vpc --region $AWS_REGION --cidr-block $AWS_VPC_CIDR_BLOCK --output text --query 'Vpc.VpcId')
+aws ec2 create-tags --resources $AWS_VPC_ID --tags Key=Name,Value=$AWS_VPC_NAME
+
+# Create "eb" subnet
+
+AWS_SUBNET_ID_EB=$(aws ec2 create-subnet --vpc-id $AWS_VPC_ID --cidr-block $AWS_EB_CIDR_BLOCK --output text --query 'Subnet.SubnetId')
+aws ec2 create-tags --resources $AWS_SUBNET_ID_EB --tags Key=Name,Value=eb
