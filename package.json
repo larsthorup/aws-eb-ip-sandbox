@@ -4,7 +4,7 @@
   "description": "Create AWS Elastic Beanstalk environment with fixed ip outbound requests for white list protecting external services",
   "main": "index.js",
   "scripts": {
-    "create-bundle": "bestzip bundle.zip package.json src/*",
+    "create-bundle": "bestzip output/bundle.zip package.json src/*",
     "start": "node src/main"
   },
   "repository": {

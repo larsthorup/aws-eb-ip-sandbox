@@ -1,6 +1,6 @@
 .idea
-bundle.zip
 node_modules
+output
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

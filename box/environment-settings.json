@@ -8,5 +8,20 @@
     "Namespace": "aws:autoscaling:launchconfiguration",
     "OptionName": "InstanceType",
     "Value": "t2.small"
+  },
+  {
+    "Namespace": "aws:ec2:vpc",
+    "OptionName": "VPCId",
+    "Value": "$AWS_VPC_ID"
+  },
+  {
+    "Namespace": "aws:ec2:vpc",
+    "OptionName": "Subnets",
+    "Value": "$AWS_SUBNET_ID_EB"
+  },
+  {
+    "Namespace": "aws:ec2:vpc",
+    "OptionName": "ELBSubnets",
+    "Value": "$AWS_SUBNET_ID_EB"
   }
 ]
