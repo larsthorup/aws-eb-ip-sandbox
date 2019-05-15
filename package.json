@@ -4,7 +4,8 @@
   "description": "Create AWS Elastic Beanstalk environment with fixed ip outbound requests for white list protecting external services",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "create-bundle": "bestzip bundle.zip package.json src/*",
+    "start": "node src/main"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/larsthorup/aws-eb-ip-sandbox/issues"
   },
-  "homepage": "https://github.com/larsthorup/aws-eb-ip-sandbox#readme"
+  "homepage": "https://github.com/larsthorup/aws-eb-ip-sandbox#readme",
+  "devDependencies": {
+    "bestzip": "^2.1.2"
+  },
+  "dependencies": {
+    "got": "^9.6.0"
+  }
 }

@@ -4,6 +4,7 @@ Create AWS Elastic Beanstalk environment with fixed ip outbound requests for whi
 
 ## Prerequisites
 
+* Node.js
 * Bash
 * AWS account
 * https://console.aws.amazon.com/iam/home/
@@ -15,10 +16,20 @@ Create AWS Elastic Beanstalk environment with fixed ip outbound requests for whi
   * select region: eu-central-1
   * create application: aws-eb-ip-sandbox
   * create SSH key pair: aws-eb-ip-sandbox
+* Verify service roles created:
+  * https://console.aws.amazon.com/iam/home?region=eu-central-1#/roles
+  * aws-elasticbeanstalk-ec2-role
+  * aws-elasticbeanstalk-service-role 
+* Create S3 deploy bundle: aws-eb-ip-sandbox
 
 ## Box creation
 
     . configure
-    box/create
-    box/list
-    box/delete
+    box/create.sh
+    box/create-environment.sh
+    box/list.sh
+    box/delete.sh
+
+## Test static IP from box
+
+* http://maroon-aws-eb-ip-sandbox.eu-central-1.elasticbeanstalk.com/https://webhook.site/ba6931bb-8a3a-4ee1-8beb-8cb25c015870
