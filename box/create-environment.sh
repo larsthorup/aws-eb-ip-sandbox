@@ -1,3 +1,6 @@
+DIR="${BASH_SOURCE%/*}"
+. $DIR/../configure.sh
+
 echo Creating bundle
 
 mkdir -p output

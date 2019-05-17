@@ -1,4 +1,5 @@
-if [ -z "$AWS_VPC_NAME" ]; then { echo "Error: run . script/configure"; exit 1; } fi
+DIR="${BASH_SOURCE%/*}"
+. $DIR/../configure.sh
 
 echo Creating VPC
 
@@ -51,8 +52,24 @@ echo Adding route for 0.0.0.0/0 through $AWS_VPC_INTERNET_GATEWAY_ID in main rou
 AWS_VPC_MAIN_ROUTE_TABLE_ID=$(aws ec2 describe-route-tables \
   --filters Name=vpc-id,Values=$AWS_VPC_ID Name=association.main,Values=true \
   --output text \
-  --query 'RouteTables[0].RouteTableId'
+  --query 'RouteTables[0].RouteTableId' \
 )
-aws ec2 create-route --route-table-id $AWS_VPC_MAIN_ROUTE_TABLE_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $AWS_VPC_INTERNET_GATEWAY_ID
+aws ec2 create-route \
+  --route-table-id $AWS_VPC_MAIN_ROUTE_TABLE_ID \
+  --destination-cidr-block 0.0.0.0/0 \
+  --gateway-id $AWS_VPC_INTERNET_GATEWAY_ID
 
 echo Route for 0.0.0.0/0 through internet gateway added to $AWS_VPC_MAIN_ROUTE_TABLE_ID
+
+echo Allocating static IP address to $AWS_VPC_ID
+
+AWS_VPC_ADDRESS_ALLOCATION_ID=$(aws ec2 allocate-address \
+  --domain vpc \
+  --output text \
+  --query 'AllocationId' \
+)
+aws ec2 create-tags \
+  --resources $AWS_VPC_ADDRESS_ALLOCATION_ID \
+  --tags Key=Name,Value=$AWS_VPC_NAME
+
+echo Allocation $AWS_VPC_ADDRESS_ALLOCATION_ID created

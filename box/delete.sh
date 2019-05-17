@@ -1,4 +1,5 @@
-if [ -z "$AWS_VPC_NAME" ]; then { echo "Error: run . script/configure"; exit 1; } fi
+DIR="${BASH_SOURCE%/*}"
+. $DIR/../configure.sh
 
 AWS_VPC_ID=$(aws ec2 describe-vpcs \
   --filters Name=tag:Name,Values=$AWS_VPC_NAME \
@@ -6,7 +7,18 @@ AWS_VPC_ID=$(aws ec2 describe-vpcs \
   --query 'Vpcs[0].VpcId' \
 )
 
+echo Releasing static IP address for $AWS_VPC_ID
+
+AWS_VPC_ADDRESS_ALLOCATION_ID=$(aws ec2 describe-addresses \
+  --filters Name=tag:Name,Values=$AWS_VPC_NAME \
+  --output text \
+  --query 'Addresses[0].AllocationId' \
+)
+aws ec2 release-address \
+  --allocation-id $AWS_VPC_ADDRESS_ALLOCATION_ID
+
 echo Detaching and deleting internet gateway for $AWS_VPC_ID
+
 AWS_VPC_INTERNET_GATEWAY_ID=$(aws ec2 describe-internet-gateways \
   --filters Name=tag:Name,Values=$AWS_VPC_NAME \
   --output text \
