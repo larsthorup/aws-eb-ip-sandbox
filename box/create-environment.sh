@@ -49,3 +49,18 @@ aws elasticbeanstalk create-environment \
   --version-label $AWS_EB_APP_VERSION_LABEL \
   --solution-stack-name "64bit Amazon Linux 2018.03 v4.8.3 running Node.js" \
   --option-settings file://output/environment-settings.json
+
+while [ "$(aws elasticbeanstalk describe-environments \
+  --region $AWS_REGION \
+  --environment-names $AWS_EB_ENVIRONMENT_NAME \
+  --output text
+  --query 'Environments[0].Health' \
+)" != "Green" ]
+do
+  aws elasticbeanstalk describe-environments \
+    --region $AWS_REGION \
+    --environment-names $AWS_EB_ENVIRONMENT_NAME \
+    --output text \
+    --query 'Environments[0].Health'
+  sleep 2
+done

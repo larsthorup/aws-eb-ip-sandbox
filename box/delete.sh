@@ -63,7 +63,7 @@ AWS_SUBNET_ID0=$(aws ec2 describe-subnets \
 )
 aws ec2 delete-subnet \
   --subnet-id $AWS_SUBNET_ID0
-sleep 10 # Note: wait for subnets to no longer be dependencies of the VPC
+sleep 20 # Note: wait for subnets to no longer be dependencies of the VPC
 
 echo Deleting $AWS_VPC_ID
 
