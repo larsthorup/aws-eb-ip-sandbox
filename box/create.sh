@@ -1,6 +1,8 @@
 DIR="${BASH_SOURCE%/*}"
 . $DIR/../configure.sh
 
+echo -----------------
+
 echo Creating VPC
 
 AWS_VPC_ID=$(aws ec2 create-vpc \
@@ -14,6 +16,8 @@ aws ec2 create-tags \
   --tags Key=Name,Value=$AWS_VPC_NAME
 
 echo $AWS_VPC_ID created
+
+echo -----------------
 
 echo Creating "eb" subnet in $AWS_VPC_ID
 
@@ -31,6 +35,8 @@ aws ec2 create-tags \
   --tags Key=Name,Value=eb
 echo $AWS_SUBNET_ID_EB created
 
+echo -----------------
+
 echo Creating "nat" subnet in $AWS_VPC_ID
 
 AWS_SUBNET_ID_NAT=$(aws ec2 create-subnet \
@@ -46,6 +52,8 @@ aws ec2 create-tags \
   --resources $AWS_SUBNET_ID_NAT \
   --tags Key=Name,Value=nat
 echo $AWS_SUBNET_ID_NAT created
+
+echo -----------------
 
 echo Creating and attaching internet gateway in $AWS_VPC_ID
 
@@ -63,6 +71,36 @@ aws ec2 attach-internet-gateway \
 
 echo $AWS_VPC_INTERNET_GATEWAY_ID created and attached to $AWS_VPC_ID
 
+echo -----------------
+
+echo Allocating static IP address to $AWS_VPC_ID
+
+AWS_VPC_ADDRESS_ALLOCATION_ID=$(aws ec2 allocate-address \
+  --domain vpc \
+  --output text \
+  --query 'AllocationId' \
+)
+aws ec2 create-tags \
+  --resources $AWS_VPC_ADDRESS_ALLOCATION_ID \
+  --tags Key=Name,Value=$AWS_VPC_NAME
+
+echo Allocation $AWS_VPC_ADDRESS_ALLOCATION_ID created
+
+echo -----------------
+
+echo Creating NAT gateway in "nat" subnet of $AWS_VPC_ID and associate static IP
+
+AWS_NAT_GATEWAY_ID=$(aws ec2 create-nat-gateway \
+  --subnet-id $AWS_SUBNET_ID_NAT \
+  --allocation-id $AWS_VPC_ADDRESS_ALLOCATION_ID \
+  --output text \
+  --query 'NatGateway.NatGatewayId' \
+)
+
+echo $AWS_NAT_GATEWAY_ID created
+
+echo -----------------
+
 echo Adding route for 0.0.0.0/0 through $AWS_VPC_INTERNET_GATEWAY_ID in main route table of $AWS_VPC_ID
 
 AWS_VPC_MAIN_ROUTE_TABLE_ID=$(aws ec2 describe-route-tables \
@@ -77,15 +115,4 @@ aws ec2 create-route \
 
 echo Route for 0.0.0.0/0 through internet gateway added to $AWS_VPC_MAIN_ROUTE_TABLE_ID
 
-echo Allocating static IP address to $AWS_VPC_ID
-
-AWS_VPC_ADDRESS_ALLOCATION_ID=$(aws ec2 allocate-address \
-  --domain vpc \
-  --output text \
-  --query 'AllocationId' \
-)
-aws ec2 create-tags \
-  --resources $AWS_VPC_ADDRESS_ALLOCATION_ID \
-  --tags Key=Name,Value=$AWS_VPC_NAME
-
-echo Allocation $AWS_VPC_ADDRESS_ALLOCATION_ID created
+echo -----------------

@@ -23,6 +23,10 @@ aws ec2 describe-addresses \
   --filters Name=tag:Name,Values=$AWS_VPC_NAME \
   --query 'Addresses[*]'
 
+aws ec2 describe-nat-gateways \
+  --filter Name=vpc-id,Values=$AWS_VPC_ID \
+  --query 'NatGateways[*]'
+
 aws elasticbeanstalk describe-environments \
   --application-name $AWS_EB_APP_NAME \
   --environment-names $AWS_EB_ENVIRONMENT_NAME \

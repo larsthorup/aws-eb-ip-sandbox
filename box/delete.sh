@@ -7,6 +7,29 @@ AWS_VPC_ID=$(aws ec2 describe-vpcs \
   --query 'Vpcs[0].VpcId' \
 )
 
+echo Deleting NAT Gateway for $AWS_VPC_ID
+
+AWS_NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways \
+  --filter Name=vpc-id,Values=$AWS_VPC_ID \
+  --output text \
+  --query 'NatGateways[0].NatGatewayId' \
+)
+aws ec2 delete-nat-gateway \
+  --nat-gateway-id $AWS_NAT_GATEWAY_ID
+
+sleep 2
+while [ "$(aws ec2 describe-nat-gateways \
+  --filter Name=vpc-id,Values=$AWS_VPC_ID \
+  --output text \
+  --query 'NatGateways[0].State')" == "deleting" ]
+do
+  aws ec2 describe-nat-gateways \
+    --filter Name=vpc-id,Values=$AWS_VPC_ID \
+    --output text \
+    --query 'NatGateways[0].State'
+  sleep 2
+done
+
 echo Releasing static IP address for $AWS_VPC_ID
 
 AWS_VPC_ADDRESS_ALLOCATION_ID=$(aws ec2 describe-addresses \
@@ -40,6 +63,7 @@ AWS_SUBNET_ID0=$(aws ec2 describe-subnets \
 )
 aws ec2 delete-subnet \
   --subnet-id $AWS_SUBNET_ID0
+sleep 10 # Note: wait for subnets to no longer be dependencies of the VPC
 
 echo Deleting $AWS_VPC_ID
 
