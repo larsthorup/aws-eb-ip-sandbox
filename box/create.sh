@@ -31,6 +31,22 @@ aws ec2 create-tags \
   --tags Key=Name,Value=eb
 echo $AWS_SUBNET_ID_EB created
 
+echo Creating "nat" subnet in $AWS_VPC_ID
+
+AWS_SUBNET_ID_NAT=$(aws ec2 create-subnet \
+  --vpc-id $AWS_VPC_ID \
+  --cidr-block $AWS_NAT_CIDR_BLOCK \
+  --output text \
+  --query 'Subnet.SubnetId' \
+)
+aws ec2 modify-subnet-attribute \
+  --subnet-id $AWS_SUBNET_ID_NAT \
+  --map-public-ip-on-launch
+aws ec2 create-tags \
+  --resources $AWS_SUBNET_ID_NAT \
+  --tags Key=Name,Value=nat
+echo $AWS_SUBNET_ID_NAT created
+
 echo Creating and attaching internet gateway in $AWS_VPC_ID
 
 AWS_VPC_INTERNET_GATEWAY_ID=$(aws ec2 create-internet-gateway \
