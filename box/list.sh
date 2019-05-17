@@ -27,6 +27,10 @@ aws ec2 describe-nat-gateways \
   --filter Name=vpc-id,Values=$AWS_VPC_ID \
   --query 'NatGateways[*]'
 
+aws ec2 describe-route-tables \
+  --filters Name=vpc-id,Values=$AWS_VPC_ID \
+  --query 'RouteTables[*]'
+
 aws elasticbeanstalk describe-environments \
   --application-name $AWS_EB_APP_NAME \
   --environment-names $AWS_EB_ENVIRONMENT_NAME \
@@ -38,9 +42,17 @@ AWS_EB_ENVIRONMENT_ID=$(aws elasticbeanstalk describe-environments \
   --output text \
   --query 'Environments[0].EnvironmentId' \
 )
+AWS_EB_ENVIRONMENT_STATUS=$(aws elasticbeanstalk describe-environments \
+  --application-name $AWS_EB_APP_NAME \
+  --environment-names $AWS_EB_ENVIRONMENT_NAME \
+  --output text \
+  --query 'Environments[0].Status' \
+)
 
 if [ "$AWS_EB_ENVIRONMENT_ID" == "None" ]; then
   echo No environment
+elif [ "$AWS_EB_ENVIRONMENT_STATUS" == "Terminated" ]; then
+  echo Environment terminated
 else
 
   aws elasticbeanstalk describe-environment-resources \

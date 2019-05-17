@@ -7,6 +7,37 @@ AWS_VPC_ID=$(aws ec2 describe-vpcs \
   --query 'Vpcs[0].VpcId' \
 )
 
+AWS_SUBNET_ID_EB=$(aws ec2 describe-subnets \
+  --filters Name=vpc-id,Values=$AWS_VPC_ID Name=tag:Name,Values=eb \
+  --output text \
+  --query 'Subnets[0].SubnetId' \
+)
+
+AWS_SUBNET_ID_NAT=$(aws ec2 describe-subnets \
+  --filters Name=vpc-id,Values=$AWS_VPC_ID Name=tag:Name,Values=nat \
+  --output text \
+  --query 'Subnets[0].SubnetId' \
+)
+
+echo Deleting "eb" route table for $AWS_VPC_ID
+
+AWS_EB_ROUTE_TABLE_ID=$(aws ec2 describe-route-tables \
+  --filters Name=vpc-id,Values=$AWS_VPC_ID Name=tag:Name,Values=eb \
+  --output text \
+  --query 'RouteTables[0].RouteTableId' \
+)
+AWS_EB_ROUTE_TABLE_ASSOCIATION_ID=$(aws ec2 describe-route-tables \
+  --filters \
+    Name=association.route-table-id,Values=$AWS_EB_ROUTE_TABLE_ID \
+    Name=association.subnet-id,Values=$AWS_SUBNET_ID_EB \
+  --output text \
+  --query 'RouteTables[0].Associations[0].RouteTableAssociationId' \
+)
+aws ec2 disassociate-route-table \
+  --association-id $AWS_EB_ROUTE_TABLE_ASSOCIATION_ID
+aws ec2 delete-route-table \
+  --route-table-id $AWS_EB_ROUTE_TABLE_ID
+
 echo Deleting NAT Gateway for $AWS_VPC_ID
 
 AWS_NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways \
@@ -56,14 +87,11 @@ aws ec2 delete-internet-gateway \
 
 echo Deleting subnets for $AWS_VPC_ID
 
-AWS_SUBNET_ID0=$(aws ec2 describe-subnets \
-  --filters Name=vpc-id,Values=$AWS_VPC_ID \
-  --output text \
-  --query 'Subnets[0].SubnetId' \
-)
 aws ec2 delete-subnet \
-  --subnet-id $AWS_SUBNET_ID0
-sleep 20 # Note: wait for subnets to no longer be dependencies of the VPC
+  --subnet-id $AWS_SUBNET_ID_EB
+
+aws ec2 delete-subnet \
+  --subnet-id $AWS_SUBNET_ID_NAT
 
 echo Deleting $AWS_VPC_ID
 

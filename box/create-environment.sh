@@ -53,7 +53,7 @@ aws elasticbeanstalk create-environment \
 while [ "$(aws elasticbeanstalk describe-environments \
   --region $AWS_REGION \
   --environment-names $AWS_EB_ENVIRONMENT_NAME \
-  --output text
+  --output text \
   --query 'Environments[0].Health' \
 )" != "Green" ]
 do

@@ -96,6 +96,18 @@ AWS_NAT_GATEWAY_ID=$(aws ec2 create-nat-gateway \
   --output text \
   --query 'NatGateway.NatGatewayId' \
 )
+sleep 2
+while [ "$(aws ec2 describe-nat-gateways \
+  --filter Name=vpc-id,Values=$AWS_VPC_ID \
+  --output text \
+  --query 'NatGateways[0].State')" != "available" ]
+do
+  aws ec2 describe-nat-gateways \
+    --filter Name=vpc-id,Values=$AWS_VPC_ID \
+    --output text \
+    --query 'NatGateways[0].State'
+  sleep 2
+done
 
 echo $AWS_NAT_GATEWAY_ID created
 
@@ -116,3 +128,35 @@ aws ec2 create-route \
 echo Route for 0.0.0.0/0 through internet gateway added to $AWS_VPC_MAIN_ROUTE_TABLE_ID
 
 echo -----------------
+
+echo Adding route for 0.0.0.0/0 through $AWS_NAT_GATEWAY_ID in new "eb" route table
+
+AWS_EB_ROUTE_TABLE_ID=$(aws ec2 create-route-table \
+  --vpc-id $AWS_VPC_ID \
+  --output text \
+  --query 'RouteTable.RouteTableId' \
+)
+aws ec2 create-tags \
+  --resources $AWS_EB_ROUTE_TABLE_ID \
+  --tags Key=Name,Value=eb
+
+echo ToDo: figure out how to make this work for all outgoing traffic, not this explicit IP
+aws ec2 create-route \
+  --route-table-id $AWS_EB_ROUTE_TABLE_ID \
+  --destination-cidr-block 188.226.137.35/32 \
+  --gateway-id $AWS_NAT_GATEWAY_ID
+
+echo ToDo: apparently this is required for connectivity to the EB instance
+aws ec2 create-route \
+  --route-table-id $AWS_EB_ROUTE_TABLE_ID \
+  --destination-cidr-block 0.0.0.0/0 \
+  --gateway-id $AWS_VPC_INTERNET_GATEWAY_ID
+
+echo aws ec2 associate-route-table \
+  --route-table-id $AWS_EB_ROUTE_TABLE_ID \
+  --subnet-id $AWS_SUBNET_ID_EB
+
+echo Route for external IP through NAT gateway added to $AWS_EB_ROUTE_TABLE_ID
+
+echo -----------------
+
