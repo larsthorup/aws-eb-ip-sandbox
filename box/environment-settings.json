@@ -22,6 +22,6 @@
   {
     "Namespace": "aws:ec2:vpc",
     "OptionName": "ELBSubnets",
-    "Value": "$AWS_SUBNET_ID_EB"
+    "Value": "$AWS_SUBNET_ID_NAT"
   }
 ]

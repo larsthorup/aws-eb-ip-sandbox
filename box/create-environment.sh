@@ -38,6 +38,11 @@ export AWS_SUBNET_ID_EB=$(aws ec2 describe-subnets \
   --output text \
   --query 'Subnets[0].SubnetId' \
 )
+export AWS_SUBNET_ID_NAT=$(aws ec2 describe-subnets \
+  --filters Name=vpc-id,Values=$AWS_VPC_ID Name=tag:Name,Values=nat \
+  --output text \
+  --query 'Subnets[0].SubnetId' \
+)
 
 cat box/environment-settings.json | envsubst > output/environment-settings.json
 

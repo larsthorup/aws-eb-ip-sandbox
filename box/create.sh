@@ -140,19 +140,12 @@ aws ec2 create-tags \
   --resources $AWS_EB_ROUTE_TABLE_ID \
   --tags Key=Name,Value=eb
 
-echo ToDo: figure out how to make this work for all outgoing traffic, not this explicit IP
-aws ec2 create-route \
-  --route-table-id $AWS_EB_ROUTE_TABLE_ID \
-  --destination-cidr-block 188.226.137.35/32 \
-  --gateway-id $AWS_NAT_GATEWAY_ID
-
-echo ToDo: apparently this is required for connectivity to the EB instance
 aws ec2 create-route \
   --route-table-id $AWS_EB_ROUTE_TABLE_ID \
   --destination-cidr-block 0.0.0.0/0 \
-  --gateway-id $AWS_VPC_INTERNET_GATEWAY_ID
+  --gateway-id $AWS_NAT_GATEWAY_ID
 
-echo aws ec2 associate-route-table \
+aws ec2 associate-route-table \
   --route-table-id $AWS_EB_ROUTE_TABLE_ID \
   --subnet-id $AWS_SUBNET_ID_EB
 

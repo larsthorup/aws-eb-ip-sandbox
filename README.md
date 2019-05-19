@@ -26,8 +26,7 @@ Create AWS Elastic Beanstalk environment with fixed ip outbound requests for whi
 
 ## Box creation
 
-    box/create.sh
-    box/create-environment.sh
+    box/create.sh && box/create-environment.sh
     box/list.sh
     box/delete.sh
 

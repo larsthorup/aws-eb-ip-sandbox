@@ -19,6 +19,37 @@ AWS_SUBNET_ID_NAT=$(aws ec2 describe-subnets \
   --query 'Subnets[0].SubnetId' \
 )
 
+echo Deleting environment $AWS_EB_ENVIRONMENT_NAME
+
+AWS_EB_ENVIRONMENT_ID=$(aws elasticbeanstalk describe-environments \
+  --application-name $AWS_EB_APP_NAME \
+  --environment-names $AWS_EB_ENVIRONMENT_NAME \
+  --output text \
+  --query 'Environments[0].EnvironmentId' \
+)
+echo aaaa
+aws elasticbeanstalk terminate-environment \
+  --environment-id $AWS_EB_ENVIRONMENT_ID
+echo bbb
+sleep 2
+while [ \
+  "$(aws elasticbeanstalk describe-environments \
+    --application-name $AWS_EB_APP_NAME \
+    --environment-names $AWS_EB_ENVIRONMENT_NAME \
+    --output text \
+    --query 'Environments[0].Status' \
+  )" == "Terminating" \
+]; do
+  echo ccc
+  aws elasticbeanstalk describe-environments \
+    --application-name $AWS_EB_APP_NAME \
+    --environment-names $AWS_EB_ENVIRONMENT_NAME \
+    --output text \
+    --query 'Environments[0].Status' \
+ echo dddd
+  sleep 2
+done
+
 echo Deleting "eb" route table for $AWS_VPC_ID
 
 AWS_EB_ROUTE_TABLE_ID=$(aws ec2 describe-route-tables \
