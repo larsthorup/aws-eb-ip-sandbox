@@ -27,10 +27,8 @@ AWS_EB_ENVIRONMENT_ID=$(aws elasticbeanstalk describe-environments \
   --output text \
   --query 'Environments[0].EnvironmentId' \
 )
-echo aaaa
 aws elasticbeanstalk terminate-environment \
   --environment-id $AWS_EB_ENVIRONMENT_ID
-echo bbb
 sleep 2
 while [ \
   "$(aws elasticbeanstalk describe-environments \
@@ -40,15 +38,10 @@ while [ \
     --query 'Environments[0].Status' \
   )" == "Terminating" \
 ]; do
-  echo ccc
-  aws elasticbeanstalk describe-environments \
-    --application-name $AWS_EB_APP_NAME \
-    --environment-names $AWS_EB_ENVIRONMENT_NAME \
-    --output text \
-    --query 'Environments[0].Status' \
- echo dddd
+  echo -n .
   sleep 2
 done
+echo
 
 echo Deleting "eb" route table for $AWS_VPC_ID
 
@@ -85,12 +78,10 @@ while [ "$(aws ec2 describe-nat-gateways \
   --output text \
   --query 'NatGateways[0].State')" == "deleting" ]
 do
-  aws ec2 describe-nat-gateways \
-    --filter Name=vpc-id,Values=$AWS_VPC_ID \
-    --output text \
-    --query 'NatGateways[0].State'
+  echo -n .
   sleep 2
 done
+echo
 
 echo Releasing static IP address for $AWS_VPC_ID
 

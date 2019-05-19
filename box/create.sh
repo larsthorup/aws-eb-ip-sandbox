@@ -102,12 +102,10 @@ while [ "$(aws ec2 describe-nat-gateways \
   --output text \
   --query 'NatGateways[0].State')" != "available" ]
 do
-  aws ec2 describe-nat-gateways \
-    --filter Name=vpc-id,Values=$AWS_VPC_ID \
-    --output text \
-    --query 'NatGateways[0].State'
+  echo -n .
   sleep 2
 done
+echo
 
 echo $AWS_NAT_GATEWAY_ID created
 

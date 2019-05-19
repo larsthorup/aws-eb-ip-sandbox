@@ -62,10 +62,7 @@ while [ "$(aws elasticbeanstalk describe-environments \
   --query 'Environments[0].Health' \
 )" != "Green" ]
 do
-  aws elasticbeanstalk describe-environments \
-    --region $AWS_REGION \
-    --environment-names $AWS_EB_ENVIRONMENT_NAME \
-    --output text \
-    --query 'Environments[0].Health'
+  echo -n .
   sleep 2
 done
+echo
